@@ -1,84 +1,121 @@
-import tkinter as tk
-from tkinter import filedialog, ttk, messagebox
+import sys
 import os
-from algorithms import *
+import numpy as np
+import pandas as pd
+from scipy import ndimage
+from PyQt5 import QtWidgets, QtCore
+from pyvistaqt import QtInteractor
+import pyvista as pv
 from dataprocessing import *
 from visualization import *
+from algorithms import *
 
-class SurfaceApp:
-
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Surface Height Analysis")
+class SurfaceApp(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Surface Height Analysis")
+        self.resize(1000, 700)
 
         self.Z = None
         self.current_file = None
 
-        self.build_ui()
+        self._build_ui()
 
-    def build_ui(self):
-        # 左侧按钮区
-        left = tk.Frame(self.root)
-        left.pack(side="left", fill="y", padx=5, pady=5)
+    def _build_ui(self):
+        central_widget = QtWidgets.QWidget()
+        self.setCentralWidget(central_widget)
 
-        tk.Button(left, text="1. 导入 ASC", command=self.load_file).pack(fill="x")
-        tk.Button(left, text="3. 3D 可视化", command=self.visualize_3d).pack(fill="x")
+        layout = QtWidgets.QHBoxLayout(central_widget)
 
-        # 右侧绘图区 ⭐
-        self.plot_frame = tk.Frame(self.root, bg="white")
-        self.plot_frame.pack(side="right", fill="both", expand=True)
+        # 左侧按钮和日志
+        left = QtWidgets.QVBoxLayout()
+        layout.addLayout(left, 0)
 
-        # ===== 方法选择 =====
-        self.method = tk.StringVar(value="method3")
-        ttk.Radiobutton(left, text="方法1", variable=self.method, value="method1").pack(anchor="w")
-        ttk.Radiobutton(left, text="方法2", variable=self.method, value="method2").pack(anchor="w")
-        ttk.Radiobutton(left, text="方法3", variable=self.method, value="method3").pack(anchor="w")
+        self.load_btn = QtWidgets.QPushButton("1. 导入 ASC")
+        self.load_btn.clicked.connect(self.load_file)
+        left.addWidget(self.load_btn)
 
-        # ===== 输出区 =====
-        self.output = tk.Text(self.root, height=10)
-        self.output.pack(fill="both", expand=True)
+        self.visual_btn = QtWidgets.QPushButton("2. 3D 可视化")
+        self.visual_btn.clicked.connect(self.visualize_3d)
+        left.addWidget(self.visual_btn)
+
+        self.height_btn = QtWidgets.QPushButton("3. 高度计算")
+        self.height_btn.clicked.connect(self.compute_height)
+        left.addWidget(self.height_btn)
+
+        # 方法选择
+        self.method_group = QtWidgets.QButtonGroup()
+        self.method1_radio = QtWidgets.QRadioButton("方法1")
+        self.method2_radio = QtWidgets.QRadioButton("方法2")
+        self.method3_radio = QtWidgets.QRadioButton("方法3")
+        self.method3_radio.setChecked(True)
+        self.method_group.addButton(self.method1_radio)
+        self.method_group.addButton(self.method2_radio)
+        self.method_group.addButton(self.method3_radio)
+        left.addWidget(self.method1_radio)
+        left.addWidget(self.method2_radio)
+        left.addWidget(self.method3_radio)
+
+        # 日志输出
+        self.log_text = QtWidgets.QTextEdit()
+        self.log_text.setReadOnly(True)
+        left.addWidget(self.log_text, 1)
+
+        # 右侧 PyVista 3D 绘图
+        self.plotter_frame = QtWidgets.QFrame()
+        layout.addWidget(self.plotter_frame, 1)
+
+        self.plotter = QtInteractor(self.plotter_frame)
+        pv.set_plot_theme("document")
+        self.plotter_frame_layout = QtWidgets.QVBoxLayout(self.plotter_frame)
+        self.plotter_frame_layout.addWidget(self.plotter.interactor)
 
     def log(self, msg):
-        self.output.insert("end", msg + "\n")
-        self.output.see("end")
+        self.log_text.append(msg)
+        self.log_text.verticalScrollBar().setValue(self.log_text.verticalScrollBar().maximum())
 
+    # -------------------
+    # 按钮回调
+    # -------------------
     def load_file(self):
-        paths = filedialog.askopenfilenames(
-            title="选择 ASC 文件",
-            filetypes=[("ASC files", "*.asc")]
-        )
+        paths, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "选择 ASC 文件", "", "ASC Files (*.asc)")
         if not paths:
             return
-
-        self.current_file = paths[0]  # 先做单文件
-        self.Z, _ = asc_to_csv(self.current_file, "csv_files", header_lines=12)
-
-        self.log(f"已加载文件：{os.path.basename(self.current_file)}")
-        self.log(f"数据尺寸：{self.Z.shape}")
+        try:
+            self.Z, csv_path = asc_to_csv(paths[0], output_dir="csv_files", header_lines=12)
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "错误", str(e))
+            return
+        self.current_file = paths[0]
+        self.log(f"已加载: {os.path.basename(paths[0])}, CSV: {csv_path}, 数据形状: {self.Z.shape}")
 
     def visualize_3d(self):
         if self.Z is None:
-            messagebox.showwarning("提示", "请先导入数据")
+            QtWidgets.QMessageBox.warning(self, "提示", "请先加载数据")
             return
 
-        visualize_3d(self.Z, size_um=437)
+        self.plotter.clear()
+        mesh = Z_to_mesh(self.Z)
+        self.plotter.add_mesh(mesh, scalars="height", cmap="jet")
+        self.plotter.enable_eye_dome_lighting()
+        self.plotter.reset_camera()
+        self.plotter.render()
 
     def compute_height(self):
         if self.Z is None:
-            messagebox.showwarning("提示", "请先导入数据")
+            QtWidgets.QMessageBox.warning(self, "提示", "请先加载数据")
             return
 
-        m = self.method.get()
+        if self.method1_radio.isChecked():
+            method = "method1"
+        elif self.method2_radio.isChecked():
+            method = "method2"
+        else:
+            method = "method3"
 
-        if m == "method1":
-            dz, plane, mark = plane_and_marker_height1(self.Z)
+        # 这里默认都用 compute_plane_and_mark_height，可替换成你的方法1/2/3
+        plane, mark, delta, _ = plane_and_marker_height1(self.Z)
 
-        elif m == "method2":
-            plane, mark, dz = compute_plane_and_mark_height2(self.Z)
-
-        elif m == "method3":
-            plane, mark, dz, _ = plane_and_marker_height3(self.Z)
-
-        self.log(f"[{m}] 平面高度: {plane:.4f}")
-        self.log(f"[{m}] 标记高度: {mark:.4f}")
-        self.log(f"[{m}] 高度差: {dz:.4f}")
+        self.log(f"[{method}] 平面高度: {plane:.4f}")
+        self.log(f"[{method}] 标记高度: {mark:.4f}")
+        self.log(f"[{method}] 高度差: {delta:.4f}")

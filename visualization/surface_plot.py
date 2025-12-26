@@ -30,3 +30,12 @@ def visualize_3d(Z, size_um=437, window_name="Surface 3D"):
     # Open3D 可交互窗口
     o3d.visualization.draw_geometries([pcd], window_name=window_name)
 
+def Z_to_mesh(Z, size_um=437):
+    Nx, Ny = Z.shape
+    x = np.linspace(0, size_um, Nx)
+    y = np.linspace(0, size_um, Ny)
+    X, Y = np.meshgrid(x, y)
+    Z = np.nan_to_num(Z, nan=np.nanmin(Z))
+    grid = pv.StructuredGrid(X, Y, Z)
+    grid["height"] = Z.ravel(order="F")
+    return grid
