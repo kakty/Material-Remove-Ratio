@@ -1,114 +1,184 @@
+import os
+import numpy as np
+from PyQt5 import QtWidgets, QtCore
 from pyvistaqt import QtInteractor
-from dataprocessing import *
-from visualization import *
-from algorithms import *
+import pyvista as pv
+
+from dataprocessing.asc_reader import asc_to_csv
+from visualization.surface_plot import Z_to_mesh
+from algorithms.mark_height_1 import comupte_plane_and_marker_height1
+from algorithms.mark_height_2 import compute_plane_and_mark_height2
+from algorithms.mark_height_3 import comupte_plane_and_marker_height3
+
 
 class SurfaceApp(QtWidgets.QMainWindow):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self):
+        super().__init__()
         self.setWindowTitle("Surface Height Analysis")
-        self.resize(1000, 700)
+        self.resize(1300, 800)
 
         self.Z = None
-        self.current_file = None
+        self.mesh = None
 
         self._build_ui()
 
+    # ---------------- UI ----------------
     def _build_ui(self):
-        central_widget = QtWidgets.QWidget()
-        self.setCentralWidget(central_widget)
+        central = QtWidgets.QWidget()
+        self.setCentralWidget(central)
+        main_layout = QtWidgets.QHBoxLayout(central)
 
-        layout = QtWidgets.QHBoxLayout(central_widget)
-
-        # 左侧按钮和日志
+        # ========== 左侧 ==========
         left = QtWidgets.QVBoxLayout()
-        layout.addLayout(left, 0)
+        main_layout.addLayout(left, 0)
 
-        self.load_btn = QtWidgets.QPushButton("1. 导入 ASC")
-        self.load_btn.clicked.connect(self.load_file)
-        left.addWidget(self.load_btn)
+        btn_load = QtWidgets.QPushButton("1. 导入 ASC")
+        btn_load.clicked.connect(self.load_file)
+        left.addWidget(btn_load)
 
-        self.visual_btn = QtWidgets.QPushButton("2. 3D 可视化")
-        self.visual_btn.clicked.connect(self.visualize_3d)
-        left.addWidget(self.visual_btn)
+        btn_vis = QtWidgets.QPushButton("2. 3D 可视化")
+        btn_vis.clicked.connect(self.visualize_3d)
+        left.addWidget(btn_vis)
 
-        self.height_btn = QtWidgets.QPushButton("3. 高度计算")
-        self.height_btn.clicked.connect(self.compute_height)
-        left.addWidget(self.height_btn)
+        btn_calc = QtWidgets.QPushButton("3. 高度计算")
+        btn_calc.clicked.connect(self.compute_height)
+        left.addWidget(btn_calc)
 
         # 方法选择
-        self.method_group = QtWidgets.QButtonGroup()
-        self.method1_radio = QtWidgets.QRadioButton("方法1")
-        self.method2_radio = QtWidgets.QRadioButton("方法2")
-        self.method3_radio = QtWidgets.QRadioButton("方法3")
-        self.method3_radio.setChecked(True)
-        self.method_group.addButton(self.method1_radio)
-        self.method_group.addButton(self.method2_radio)
-        self.method_group.addButton(self.method3_radio)
-        left.addWidget(self.method1_radio)
-        left.addWidget(self.method2_radio)
-        left.addWidget(self.method3_radio)
+        self.rb1 = QtWidgets.QRadioButton("方法1")
+        self.rb2 = QtWidgets.QRadioButton("方法2")
+        self.rb3 = QtWidgets.QRadioButton("方法3（百分位）")
+        self.rb3.setChecked(True)
 
-        # 日志输出
+        left.addWidget(self.rb1)
+        left.addWidget(self.rb2)
+        left.addWidget(self.rb3)
+
+        # log
         self.log_text = QtWidgets.QTextEdit()
         self.log_text.setReadOnly(True)
         left.addWidget(self.log_text, 1)
 
-        # 右侧 PyVista 3D 绘图
-        self.plotter_frame = QtWidgets.QFrame()
-        layout.addWidget(self.plotter_frame, 1)
+        # ========== 右侧 ==========
+        self.right_splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
+        main_layout.addWidget(self.right_splitter, 1)
 
-        self.plotter = QtInteractor(self.plotter_frame)
-        pv.set_plot_theme("document")
-        self.plotter_frame_layout = QtWidgets.QVBoxLayout(self.plotter_frame)
-        self.plotter_frame_layout.addWidget(self.plotter.interactor)
+        # ---------- 上：主 3D ----------
+        self.main_frame = QtWidgets.QFrame()
+        self.main_plotter = QtInteractor(self.main_frame)
+        l = QtWidgets.QVBoxLayout(self.main_frame)
+        l.setContentsMargins(0, 0, 0, 0)
+        l.addWidget(self.main_plotter.interactor)
+        self.right_splitter.addWidget(self.main_frame)
 
+        # ---------- 下：方法3 ----------
+        self.detail_widget = QtWidgets.QWidget()
+        self.detail_layout = QtWidgets.QVBoxLayout(self.detail_widget)
+        self.detail_widget.setVisible(False)
+        self.right_splitter.addWidget(self.detail_widget)
+
+        # 参数区
+        param_layout = QtWidgets.QHBoxLayout()
+        self.detail_layout.addLayout(param_layout)
+
+        self.plane_edit = QtWidgets.QSpinBox()
+        self.plane_edit.setRange(0, 100)
+        self.plane_edit.setValue(60)
+
+        self.marker_edit = QtWidgets.QSpinBox()
+        self.marker_edit.setRange(0, 100)
+        self.marker_edit.setValue(60)
+
+        btn_apply = QtWidgets.QPushButton("确定")
+        btn_apply.clicked.connect(self.apply_method3)
+
+        btn_close = QtWidgets.QPushButton("关闭")
+        btn_close.clicked.connect(lambda: self.detail_widget.setVisible(False))
+
+        param_layout.addWidget(QtWidgets.QLabel("Plane %"))
+        param_layout.addWidget(self.plane_edit)
+        param_layout.addWidget(QtWidgets.QLabel("Marker %"))
+        param_layout.addWidget(self.marker_edit)
+        param_layout.addWidget(btn_apply)
+        param_layout.addWidget(btn_close)
+
+        # mask 视图
+        mask_splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
+        self.detail_layout.addWidget(mask_splitter, 1)
+
+        self.plane_plotter = QtInteractor()
+        self.marker_plotter = QtInteractor()
+        mask_splitter.addWidget(self.plane_plotter.interactor)
+        mask_splitter.addWidget(self.marker_plotter.interactor)
+
+    # ---------------- 功能 ----------------
     def log(self, msg):
         self.log_text.append(msg)
-        self.log_text.verticalScrollBar().setValue(self.log_text.verticalScrollBar().maximum())
+        self.log_text.verticalScrollBar().setValue(
+            self.log_text.verticalScrollBar().maximum()
+        )
 
-    # -------------------
-    # 按钮回调
-    # -------------------
     def load_file(self):
-        paths, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "选择 ASC 文件", "", "ASC Files (*.asc)")
-        if not paths:
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, "选择 ASC 文件", "", "ASC Files (*.asc)"
+        )
+        if not path:
             return
-        try:
-            self.Z, csv_path = asc_to_csv(paths[0], output_dir="csv_files", header_lines=12)
-        except Exception as e:
-            QtWidgets.QMessageBox.critical(self, "错误", str(e))
-            return
-        self.current_file = paths[0]
-        self.log(f"已加载: {os.path.basename(paths[0])}, CSV: {csv_path}, 数据形状: {self.Z.shape}")
+
+        self.Z, csv_path = asc_to_csv(path, "csv_files", header_lines=12)
+        self.log(f"已加载 {os.path.basename(path)}  Z shape={self.Z.shape}")
 
     def visualize_3d(self):
         if self.Z is None:
-            QtWidgets.QMessageBox.warning(self, "提示", "请先加载数据")
             return
 
-        self.plotter.clear()
-        mesh = Z_to_mesh(self.Z)
-        self.plotter.add_mesh(mesh, scalars="height", cmap="jet")
-        self.plotter.enable_eye_dome_lighting()
-        self.plotter.reset_camera()
-        self.plotter.render()
+        self.main_plotter.clear()
+        self.mesh = Z_to_mesh(self.Z)
+        self.main_plotter.add_mesh(self.mesh, scalars="height", cmap="jet")
+        self.main_plotter.reset_camera()
 
     def compute_height(self):
         if self.Z is None:
-            QtWidgets.QMessageBox.warning(self, "提示", "请先加载数据")
             return
 
-        if self.method1_radio.isChecked():
-            plane, mark, delta = comupte_plane_and_marker_height1(self.Z)
-            method = "方法1"
-        elif self.method2_radio.isChecked():
-            plane, mark, delta =compute_plane_and_mark_height2(self.Z)
-            method = "方法2"
-        else:
-            plane, mark, delta = comupte_plane_and_marker_height3(self.Z)
-            method = "方法3"
+        self.detail_widget.setVisible(False)
 
-        self.log(f"[{method}] 平面高度: {plane:.4f}")
-        self.log(f"[{method}] 标记高度: {mark:.4f}")
-        self.log(f"[{method}] 高度差: {delta:.4f}")
+        if self.rb1.isChecked():
+            p, m, d = comupte_plane_and_marker_height1(self.Z)
+            self.log(f"[方法1] plane={p:.4f}, marker={m:.4f}, Δz={d:.4f}")
+
+        elif self.rb2.isChecked():
+            p, m, d = compute_plane_and_mark_height2(self.Z)
+            self.log(f"[方法2] plane={p:.4f}, marker={m:.4f}, Δz={d:.4f}")
+
+        else:
+            self.detail_widget.setVisible(True)
+            self.apply_method3()
+
+    def apply_method3(self):
+        plane_p = self.plane_edit.value()
+        marker_p = self.marker_edit.value()
+
+        p, m, d, plane_mask, marker_mask = \
+            comupte_plane_and_marker_height3(
+                self.Z, plane_p, marker_p
+            )
+
+        self.log(
+            f"[方法3] plane%={plane_p}, marker%={marker_p} "
+            f"| plane={p:.4f}, marker={m:.4f}, Δz={d:.4f}"
+        )
+
+        self._plot_mask(self.plane_plotter, plane_mask, "blue")
+        self._plot_mask(self.marker_plotter, marker_mask, "red")
+
+    def _plot_mask(self, plotter, mask, color):
+        plotter.clear()
+        idx = np.column_stack(np.where(mask))
+        if idx.size == 0:
+            return
+
+        pts = np.c_[idx[:, 1], idx[:, 0], self.Z[mask]]
+        cloud = pv.PolyData(pts)
+        plotter.add_points(cloud, color=color, point_size=3)
+        plotter.reset_camera()
