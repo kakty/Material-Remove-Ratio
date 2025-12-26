@@ -9,7 +9,7 @@ from visualization.surface_plot import Z_to_mesh
 from algorithms.mark_height_1 import comupte_plane_and_marker_height1
 from algorithms.mark_height_2 import compute_plane_and_mark_height2
 from algorithms.mark_height_3 import comupte_plane_and_marker_height3
-
+from gui.batch_page import BatchPage
 
 class SurfaceApp(QtWidgets.QMainWindow):
     def __init__(self):
@@ -26,7 +26,36 @@ class SurfaceApp(QtWidgets.QMainWindow):
     def _build_ui(self):
         central = QtWidgets.QWidget()
         self.setCentralWidget(central)
-        main_layout = QtWidgets.QHBoxLayout(central)
+        main_layout = QtWidgets.QVBoxLayout(central)
+
+        # Top bar: 切换页面
+        top_bar = QtWidgets.QHBoxLayout()
+        main_layout.addLayout(top_bar)
+        btn_main = QtWidgets.QPushButton("主界面")
+        btn_batch = QtWidgets.QPushButton("批量处理")
+        top_bar.addWidget(btn_main)
+        top_bar.addWidget(btn_batch)
+        top_bar.addStretch()
+
+        # 堆叠页面
+        self.stack = QtWidgets.QStackedWidget()
+        main_layout.addWidget(self.stack, 1)
+
+        # 主界面
+        self.page_main = QtWidgets.QWidget()
+        self._build_main_page(self.page_main)
+        self.stack.addWidget(self.page_main)
+
+        # 批处理页面
+        self.page_batch = BatchPage()
+        self.stack.addWidget(self.page_batch)
+
+        # 切换按钮
+        btn_main.clicked.connect(lambda: self.stack.setCurrentIndex(0))
+        btn_batch.clicked.connect(lambda: self.stack.setCurrentIndex(1))
+
+    def _build_main_page(self, widget):
+        main_layout = QtWidgets.QHBoxLayout(widget)
 
         # ========== 左侧 ==========
         left = QtWidgets.QVBoxLayout()
@@ -87,7 +116,7 @@ class SurfaceApp(QtWidgets.QMainWindow):
 
         self.marker_edit = QtWidgets.QSpinBox()
         self.marker_edit.setRange(0, 100)
-        self.marker_edit.setValue(60)
+        self.marker_edit.setValue(80)
 
         btn_apply = QtWidgets.QPushButton("确定")
         btn_apply.clicked.connect(self.apply_method3)

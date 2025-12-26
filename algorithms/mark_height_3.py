@@ -3,7 +3,7 @@ import numpy as np
 def comupte_plane_and_marker_height3(
     Z,
     plane_percentile=60,
-    marker_percentile=60
+    marker_percentile=80
 ):
     """
     基于分位数的平面 / 标记带高度计算

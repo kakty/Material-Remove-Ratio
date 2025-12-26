@@ -1,8 +1,8 @@
-from gui.app import SurfaceApp
 from PyQt5 import QtWidgets
-import sys
+from gui.app import SurfaceApp
 
 if __name__ == "__main__":
+    import sys
     app = QtWidgets.QApplication(sys.argv)
     window = SurfaceApp()
     window.show()
