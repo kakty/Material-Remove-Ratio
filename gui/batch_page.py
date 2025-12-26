@@ -8,38 +8,36 @@ from algorithms.mark_height_3 import comupte_plane_and_marker_height3
 
 class BatchWorker(QtCore.QRunnable):
     """Worker 用于批量处理单文件"""
-    def __init__(self, idx, path, callback):
+    def __init__(self, idx, path, signal):
         super().__init__()
         self.idx = idx
         self.path = path
-        self.callback = callback
+        self.signal = signal  # pyqtSignal 用于发送结果
 
     def run(self):
-        Z, _ = asc_to_csv(self.path, "csv_files", header_lines=12)
-        p, m, d, _, _ = comupte_plane_and_marker_height3(Z)
-        del Z  # 释放内存
-        # 回调主线程更新UI
-        QtCore.QMetaObject.invokeMethod(
-            self.callback,
-            QtCore.Qt.QueuedConnection,
-            QtCore.Q_ARG(int, self.idx),
-            QtCore.Q_ARG(str, os.path.basename(self.path)),
-            QtCore.Q_ARG(float, p),
-            QtCore.Q_ARG(float, m),
-            QtCore.Q_ARG(float, d)
-        )
+        try:
+            Z, _ = asc_to_csv(self.path, "csv_files", header_lines=12)
+            p, m, d, _, _ = comupte_plane_and_marker_height3(Z)
+            del Z
+            # 发射信号给主线程
+            self.signal.emit(self.idx, os.path.basename(self.path), p, m, d)
+        except Exception as e:
+            print(f"处理 {self.path} 出错: {e}")
 
 class BatchPage(QtWidgets.QWidget):
+    result_signal = QtCore.pyqtSignal(int, str, float, float, float)
+
     def __init__(self):
         super().__init__()
         self.files = []
-        self._build_ui()
         self.pool = QtCore.QThreadPool.globalInstance()
+        self._build_ui()
+
+        self.result_signal.connect(self.on_result)
 
     def _build_ui(self):
         layout = QtWidgets.QHBoxLayout(self)
-
-        # 左侧控制区
+        # 左侧
         left = QtWidgets.QVBoxLayout()
         layout.addLayout(left, 0)
 
@@ -90,7 +88,7 @@ class BatchPage(QtWidgets.QWidget):
         self.pool.setMaxThreadCount(self.max_worker.value())
 
         for i, path in enumerate(self.files):
-            worker = BatchWorker(i, path, self.on_result)
+            worker = BatchWorker(i, path, self.result_signal)
             self.pool.start(worker)
 
     @QtCore.pyqtSlot(int, str, float, float, float)

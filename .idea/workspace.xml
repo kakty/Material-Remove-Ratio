@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="35a7d68d-9fc7-4e56-9f76-4e7626f809bc" name="更改" comment="pyqt">
+    <list default="true" id="35a7d68d-9fc7-4e56-9f76-4e7626f809bc" name="更改" comment="正在修改">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui/batch_page.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/batch_page.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,6 +62,7 @@
       <recent name="C:\Users\21093\Desktop\Material Remove Rate\visualization" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\21093\Desktop\Material Remove Rate" />
       <recent name="C:\Users\21093\Desktop\Material Remove Rate\gui" />
       <recent name="C:\Users\21093\Desktop\Material Remove Rate\app" />
     </key>
@@ -161,7 +162,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766760730811</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="正在修改">
+      <option name="closed" value="true" />
+      <created>1766764519822</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1766764519822</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -181,6 +190,7 @@
     <MESSAGE value="版本2，pyqt" />
     <MESSAGE value="主界面v1" />
     <MESSAGE value="pyqt" />
-    <option name="LAST_COMMIT_MESSAGE" value="pyqt" />
+    <MESSAGE value="正在修改" />
+    <option name="LAST_COMMIT_MESSAGE" value="正在修改" />
   </component>
 </project>
