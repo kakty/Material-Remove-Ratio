@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="35a7d68d-9fc7-4e56-9f76-4e7626f809bc" name="更改" comment="成熟版本" />
+    <list default="true" id="35a7d68d-9fc7-4e56-9f76-4e7626f809bc" name="更改" comment="pyqt">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/algorithms/mark_height_1.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithms/mark_height_1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/algorithms/mark_height_3.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithms/mark_height_3.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/visualization/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/visualization/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/visualization/surface_plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/visualization/surface_plot.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,6 +45,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.GUI.executor": "Run",
     "Python.__init__.executor": "Run",
@@ -45,6 +55,7 @@
     "Python.mark_height_1.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "master2",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "C:/Users/21093/Desktop/Material Remove Rate",
@@ -131,7 +142,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766744871425</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="pyqt">
+      <option name="closed" value="true" />
+      <created>1766746601067</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1766746601067</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -149,6 +168,7 @@
     <MESSAGE value="版本1，弹窗" />
     <MESSAGE value="版本2，嵌入尝试" />
     <MESSAGE value="版本2，pyqt" />
-    <option name="LAST_COMMIT_MESSAGE" value="版本2，pyqt" />
+    <MESSAGE value="pyqt" />
+    <option name="LAST_COMMIT_MESSAGE" value="pyqt" />
   </component>
 </project>

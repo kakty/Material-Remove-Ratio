@@ -1,7 +1,9 @@
 from gui.app import SurfaceApp
-import tkinter as tk
+from PyQt5 import QtWidgets
+import sys
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = SurfaceApp(root)
-    root.mainloop()
+    app = QtWidgets.QApplication(sys.argv)
+    window = SurfaceApp()
+    window.show()
+    sys.exit(app.exec_())

@@ -1,18 +1,11 @@
-import sys
-import os
-import numpy as np
-import pandas as pd
-from scipy import ndimage
-from PyQt5 import QtWidgets, QtCore
 from pyvistaqt import QtInteractor
-import pyvista as pv
 from dataprocessing import *
 from visualization import *
 from algorithms import *
 
 class SurfaceApp(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.setWindowTitle("Surface Height Analysis")
         self.resize(1000, 700)
 
@@ -107,14 +100,14 @@ class SurfaceApp(QtWidgets.QMainWindow):
             return
 
         if self.method1_radio.isChecked():
-            method = "method1"
+            plane, mark, delta = comupte_plane_and_marker_height1(self.Z)
+            method = "方法1"
         elif self.method2_radio.isChecked():
-            method = "method2"
+            plane, mark, delta =compute_plane_and_mark_height2(self.Z)
+            method = "方法2"
         else:
-            method = "method3"
-
-        # 这里默认都用 compute_plane_and_mark_height，可替换成你的方法1/2/3
-        plane, mark, delta, _ = plane_and_marker_height1(self.Z)
+            plane, mark, delta = comupte_plane_and_marker_height3(self.Z)
+            method = "方法3"
 
         self.log(f"[{method}] 平面高度: {plane:.4f}")
         self.log(f"[{method}] 标记高度: {mark:.4f}")

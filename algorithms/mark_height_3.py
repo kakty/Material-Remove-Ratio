@@ -1,6 +1,6 @@
 import numpy as np
 
-def plane_and_marker_height3(Z,
+def comupte_plane_and_marker_height3(Z,
                             plane_percentile=60,
                             marker_percentile=60):
     z = Z.flatten()
