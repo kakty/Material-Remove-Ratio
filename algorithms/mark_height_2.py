@@ -35,4 +35,4 @@ def compute_plane_and_mark_height2(Z, delta=5):
 
     delta_h = mark_mean - plane_mean
 
-    return plane_mean, mark_mean, delta_h, mark_mask
+    return plane_mean, mark_mean, delta_h
