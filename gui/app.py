@@ -3,13 +3,13 @@ import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from pyvistaqt import QtInteractor
 import pyvista as pv
-
 from dataprocessing.asc_reader import asc_to_csv
 from visualization.surface_plot import Z_to_mesh
 from algorithms.mark_height_1 import comupte_plane_and_marker_height1
 from algorithms.mark_height_2 import compute_plane_and_mark_height2
 from algorithms.mark_height_3 import comupte_plane_and_marker_height3
 from gui.batch_page import BatchPage
+from dataprocessing import *
 
 class SurfaceApp(QtWidgets.QMainWindow):
     def __init__(self):
@@ -154,7 +154,8 @@ class SurfaceApp(QtWidgets.QMainWindow):
         if not path:
             return
 
-        self.Z, csv_path = asc_to_csv(path, "csv_files", header_lines=12)
+        #self.Z, csv_path = asc_to_csv(path, "csv_files", header_lines=12)
+        self.Z = read_asc(path, header_lines=12)
         self.log(f"已加载 {os.path.basename(path)}  Z shape={self.Z.shape}")
 
     def visualize_3d(self):

@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import pandas as pd
+from dataprocessing.read_asc import *
 
 def safe_float(val):
     if val.lower() == 'bad':
@@ -37,8 +38,10 @@ def asc_to_csv(asc_path, output_dir, header_lines=13):
     if len(lengths) != 1:
         raise ValueError(f"列数不一致，检测到行列长度：{lengths}")
 
-    Z = np.array(rows, dtype=float)
+    # Z0 = np.array(rows, dtype=float)
+    # Z = Z0*0.6328
 
+    Z = read_asc(asc_path, header_lines)
     print("Z shape:", Z.shape)
     print("NaN ratio:", np.isnan(Z).sum() / Z.size)
 

@@ -3,8 +3,8 @@ import os
 import numpy as np
 import pandas as pd
 from PyQt5 import QtWidgets, QtCore
-from dataprocessing import asc_to_csv
 from algorithms.mark_height_3 import comupte_plane_and_marker_height3
+from dataprocessing.read_asc import read_asc
 
 class BatchWorker(QtCore.QRunnable):
     """Worker 用于批量处理单文件"""
@@ -14,9 +14,11 @@ class BatchWorker(QtCore.QRunnable):
         self.path = path
         self.signal = signal  # pyqtSignal 用于发送结果
 
+
     def run(self):
         try:
-            Z, _ = asc_to_csv(self.path, "csv_files", header_lines=12)
+            # Z, _ = asc_to_csv(self.path, "csv_files", header_lines=12)
+            Z = read_asc(self.path, header_lines=12)
             p, m, d, _, _ = comupte_plane_and_marker_height3(Z)
             del Z
             # 发射信号给主线程
