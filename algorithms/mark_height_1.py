@@ -1,6 +1,6 @@
 import numpy as np
 
-def compute_plane_marker_height2(
+def compute_plane_marker_height1(
     Z,
     plane_percentile=60,
     marker_percentile=80
