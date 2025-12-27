@@ -1,7 +1,7 @@
 import pandas as pd
 
 # ===== 参数 =====
-input_csv = "0min.csv"
+input_csv = "M0min.csv"
 output_csv = "output_delta_diff.csv"
 
 # ===== 读取 CSV =====

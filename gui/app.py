@@ -5,7 +5,7 @@ from pyvistaqt import QtInteractor
 import pyvista as pv
 from dataprocessing.asc_reader import asc_to_csv
 from visualization.surface_plot import Z_to_mesh
-from algorithms.mark_height_1 import comupte_plane_and_marker_height1
+from algorithms.mark_height_1 import compute_plane_and_marker_height1
 from algorithms.mark_height_2 import compute_plane_and_mark_height2
 from algorithms.mark_height_3 import comupte_plane_and_marker_height3
 from gui.batch_page import BatchPage
@@ -174,8 +174,8 @@ class SurfaceApp(QtWidgets.QMainWindow):
         self.detail_widget.setVisible(False)
 
         if self.rb1.isChecked():
-            p, m, d = comupte_plane_and_marker_height1(self.Z)
-            self.log(f"[方法1] plane={p:.4f}, marker={m:.4f}, Δz={d:.4f}")
+            self.detail_widget.setVisible(True)
+            self.apply_method1()
 
         elif self.rb2.isChecked():
             p, m, d = compute_plane_and_mark_height2(self.Z)
@@ -185,15 +185,20 @@ class SurfaceApp(QtWidgets.QMainWindow):
             self.detail_widget.setVisible(True)
             self.apply_method3()
 
+    def apply_method1(self):
+        plane_p = self.plane_edit.value()
+        marker_p = self.marker_edit.value()
+        mrr, marker_mask, plane_mask = compute_plane_and_marker_height1(self.Z, plane_p, marker_p)
+        self.log(
+            f"[方法1] 材料去除量%={mrr}"
+        )
+        self._plot_mask(self.plane_plotter, plane_mask, "blue")
+        self._plot_mask(self.marker_plotter, marker_mask, "red")
+
     def apply_method3(self):
         plane_p = self.plane_edit.value()
         marker_p = self.marker_edit.value()
-
-        p, m, d, plane_mask, marker_mask = \
-            comupte_plane_and_marker_height3(
-                self.Z, plane_p, marker_p
-            )
-
+        p, m,d, plane_mask, marker_mask = comupte_plane_and_marker_height3(self.Z, plane_p, marker_p)
         self.log(
             f"[方法3] plane%={plane_p}, marker%={marker_p} "
             f"| plane={p:.4f}, marker={m:.4f}, Δz={d:.4f}"
