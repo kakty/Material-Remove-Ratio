@@ -14,7 +14,7 @@ df.columns = [c.strip() for c in df.columns]
 required_cols = {"Index", "File", "Delta"}
 missing = required_cols - set(df.columns)
 if missing:
-    raise ValueError(f"缺少必要列: {missing}")
+    raise ValueError(f"缺少必要列: {missing}")#1
 
 results = []
 
