@@ -2,7 +2,7 @@ import pandas as pd
 
 # ===== 参数 =====
 input_csv = "M0min.csv"
-output_csv = "output_delta_diff.csv"
+output_csv = "output_delta_diff_M.csv"
 
 # ===== 读取 CSV =====
 df = pd.read_csv(input_csv)

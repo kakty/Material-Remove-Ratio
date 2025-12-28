@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # ================= 参数 =================
-input_dir = "output_by_position"   # 原 CSV 文件夹
+input_dir = "output_by_position_M"   # 原 CSV 文件夹
 output_csv = os.path.join(input_dir, "average.csv")
 
 # ================= 找到所有 position_X.csv 文件 =================

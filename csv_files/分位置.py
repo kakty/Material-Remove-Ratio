@@ -3,8 +3,8 @@ import numpy as np
 from scipy.interpolate import interp1d
 import os
 
-input_csv = "output_delta_diff.csv"
-output_dir = "output_by_position"
+input_csv = "output_delta_diff_M.csv"
+output_dir = "output_by_position_M"
 angle_step = 30
 
 os.makedirs(output_dir, exist_ok=True)
