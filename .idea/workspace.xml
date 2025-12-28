@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="35a7d68d-9fc7-4e56-9f76-4e7626f809bc" name="更改" comment="后续脚本" />
+    <list default="true" id="35a7d68d-9fc7-4e56-9f76-4e7626f809bc" name="更改" comment="增加license" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -243,7 +243,23 @@
       <option name="project" value="LOCAL" />
       <updated>1766923023399</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="增加license">
+      <option name="closed" value="true" />
+      <created>1766923618909</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1766923618909</updated>
+    </task>
+    <task id="LOCAL-00020" summary="增加license">
+      <option name="closed" value="true" />
+      <created>1766923699992</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1766923699992</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -267,7 +283,8 @@
     <MESSAGE value="主界面和批量化处理界面" />
     <MESSAGE value="材料去除量" />
     <MESSAGE value="后续脚本" />
-    <option name="LAST_COMMIT_MESSAGE" value="后续脚本" />
+    <MESSAGE value="增加license" />
+    <option name="LAST_COMMIT_MESSAGE" value="增加license" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
