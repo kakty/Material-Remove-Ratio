@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="35a7d68d-9fc7-4e56-9f76-4e7626f809bc" name="更改" comment="材料去除量">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/csv_files/average.py" beforeDir="false" afterPath="$PROJECT_DIR$/csv_files/average.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/csv_files/分位置.py" beforeDir="false" afterPath="$PROJECT_DIR$/csv_files/分位置.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/csv_files/对比.py" beforeDir="false" afterPath="$PROJECT_DIR$/csv_files/相同角度筛选.py" afterDir="false" />
-    </list>
+    <list default="true" id="35a7d68d-9fc7-4e56-9f76-4e7626f809bc" name="更改" comment="后续脚本" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -240,7 +235,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766831110358</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="后续脚本">
+      <option name="closed" value="true" />
+      <created>1766923023399</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1766923023399</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -263,7 +266,8 @@
     <MESSAGE value="正在修改" />
     <MESSAGE value="主界面和批量化处理界面" />
     <MESSAGE value="材料去除量" />
-    <option name="LAST_COMMIT_MESSAGE" value="材料去除量" />
+    <MESSAGE value="后续脚本" />
+    <option name="LAST_COMMIT_MESSAGE" value="后续脚本" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
