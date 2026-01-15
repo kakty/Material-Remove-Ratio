@@ -1,38 +1,52 @@
 import numpy as np
-from scipy import ndimage
 
-def compute_plane_and_mark_height2(Z, delta=5):
+
+def compute_groove_depth_method2(
+        Z,
+        plane_top_percent=50,  # 平面取值范围：最高的 50%
+        groove_bottom_percent=20  # 槽取值范围：最低的 20%
+):
     """
-    Z: 2D numpy array, 高度矩阵
-    delta: 超过平面平均高度 delta µm 的部分视为标记
-    返回：
-      plane_mean: 平面平均高度
-      mark_mean: 标记带平均高度
-      delta_h: 高度差
-      mark_mask: 标记带布尔掩码
+    方法2：基于分位数的凹槽深度计算 (Groove Depth Analysis)
+
+    参数:
+    plane_top_percent: 取最高的多少比例作为平面 (例如 50 代表取 Top 50%)
+    groove_bottom_percent: 取最低的多少比例作为槽底 (例如 20 代表取 Bottom 20%)
+
+    返回:
+    z_plane       : 平面平均高度
+    z_groove      : 槽底平均高度
+    depth         : 槽深 (平面 - 槽底)
+    plane_mask    : 平面区域 mask
+    groove_mask   : 槽区域 mask
     """
-    Z_valid = Z[np.isfinite(Z)]
 
-    # 1. 平面平均高度
-    plane_mean = np.mean(Z_valid)
+    # 1. 展平并去 NaN
+    z_flat = Z.flatten()
+    z_valid = z_flat[~np.isnan(z_flat)]
 
-    # 2. 标记带掩码
-    mark_mask = Z > (plane_mean + delta)
+    if z_valid.size == 0:
+        return np.nan, np.nan, np.nan, None, None
 
-    # 3. 可选：只取最大连通区域（防止孤立高点干扰）
-    labeled, num_features = ndimage.label(mark_mask)
-    if num_features > 1:
-        # 取面积最大的连通区域
-        sizes = ndimage.sum(mark_mask, labeled, range(1, num_features + 1))
-        largest_label = np.argmax(sizes) + 1
-        mark_mask = labeled == largest_label
+    # 2. 计算阈值
+    # 平面阈值：如果是取 Top 50%，则分位点是 100 - 50 = 50
+    # 如果平面取 Top 30%，则分位点是 70
+    p_threshold_val = np.percentile(z_valid, 100 - plane_top_percent)
 
-    # 4. 标记带平均高度
-    if np.sum(mark_mask) > 0:
-        mark_mean = np.mean(Z[mark_mask])
-    else:
-        mark_mean = np.nan
+    # 槽阈值：取 Bottom 20%，分位点就是 20
+    g_threshold_val = np.percentile(z_valid, groove_bottom_percent)
 
-    delta_h = mark_mean - plane_mean
+    # 3. 生成 Mask
+    # 平面是高于阈值的部分
+    plane_mask = (Z >= p_threshold_val) & np.isfinite(Z)
+    # 槽是低于阈值的部分
+    groove_mask = (Z <= g_threshold_val) & np.isfinite(Z)
 
-    return plane_mean, mark_mean, delta_h
+    # 4. 计算平均高度
+    z_plane = np.mean(Z[plane_mask]) if np.any(plane_mask) else np.nan
+    z_groove = np.mean(Z[groove_mask]) if np.any(groove_mask) else np.nan
+
+    # 5. 槽深 = 平面 - 槽底 (正值代表深度)
+    depth = z_plane - z_groove
+
+    return z_plane, z_groove, depth, plane_mask, groove_mask
